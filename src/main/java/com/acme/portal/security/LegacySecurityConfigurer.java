@@ -5,11 +5,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.config.http.SessionCreationPolicy;
 
 /**
@@ -19,7 +19,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(securedEnabled = true)
-public class LegacySecurityConfigurer extends WebSecurityConfigurerAdapter {
+public class LegacySecurityConfigurer {
 
     private final PortalAuthenticationProvider provider;
     private final RestAuthenticationEntryPoint entryPoint;
@@ -33,13 +33,8 @@ public class LegacySecurityConfigurer extends WebSecurityConfigurerAdapter {
         this.bridge = bridge;
     }
 
-    /*~~(Migrate manually based on https://spring.io/blog/2022/02/21/spring-security-without-the-websecurityconfigureradapter)~~>*/@Override
-    protected void configure(AuthenticationManagerBuilder auth) {
-        auth.authenticationProvider(provider);
-    }
-
-    @Override
-    protected void configure(HttpSecurity http) {
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
             .sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
             .exceptionHandling(handling -> handling.authenticationEntryPoint(entryPoint).accessDeniedHandler(deniedHandler))
@@ -51,12 +46,13 @@ public class LegacySecurityConfigurer extends WebSecurityConfigurerAdapter {
                 .requestMatchers(HttpMethod.POST, "/api/session").permitAll()
                 .requestMatchers("/api/admin/**").hasRole(Roles.ADMIN)
                 .requestMatchers("/api/**").authenticated()
-                .anyRequest().permitAll());
+                .anyRequest().permitAll())
+            .authenticationProvider(provider);
+        return http.build();
     }
 
-    /*~~(Migrate manually based on https://spring.io/blog/2022/02/21/spring-security-without-the-websecurityconfigureradapter)~~>*/@Bean
-    @Override
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
+    @Bean
+    public AuthenticationManager authenticationManager() {
+        return new ProviderManager(provider);
     }
 }
