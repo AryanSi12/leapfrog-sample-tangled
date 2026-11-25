@@ -55,7 +55,11 @@ public class SessionSecurityContextBridge implements SecurityContextBridge {
         SecurityContextHolder.clearContext();
         HttpSession session = request.getSession(false);
         if (session != null) {
-            request.logout();
+            try {
+                request.logout();
+            } catch (jakarta.servlet.ServletException ex) {
+                throw new IllegalStateException(ex);
+            }
         }
     }
 }
