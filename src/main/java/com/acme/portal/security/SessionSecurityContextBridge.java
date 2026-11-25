@@ -5,8 +5,8 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
@@ -55,7 +55,7 @@ public class SessionSecurityContextBridge implements SecurityContextBridge {
         SecurityContextHolder.clearContext();
         HttpSession session = request.getSession(false);
         if (session != null) {
-            session.invalidate();
+            request.logout();
         }
     }
 }

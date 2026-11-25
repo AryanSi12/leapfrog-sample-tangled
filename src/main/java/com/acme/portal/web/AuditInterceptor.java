@@ -4,8 +4,8 @@ import com.acme.portal.audit.AuditEvent;
 import com.acme.portal.audit.AuditSink;
 import com.acme.portal.security.PortalPrincipal;
 import com.acme.portal.security.SecurityContextBridge;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.method.HandlerMethod;
 
 /** Records who called what and how it ended, including requests the role check turned away. */

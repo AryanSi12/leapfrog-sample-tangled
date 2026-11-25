@@ -1,13 +1,13 @@
 package com.acme.portal.web;
 
 import com.acme.portal.security.SecurityContextBridge;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.method.HandlerMethod;
-import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+import org.springframework.web.servlet.HandlerInterceptor;
 
 /** Base of the portal's interceptors: only controller methods are looked at, subclasses decide. */
-public abstract class AbstractSecuredInterceptor extends HandlerInterceptorAdapter {
+public abstract class AbstractSecuredInterceptor implements HandlerInterceptor {
 
     protected final SecurityContextBridge bridge;
 
@@ -17,7 +17,7 @@ public abstract class AbstractSecuredInterceptor extends HandlerInterceptorAdapt
 
     @Override
     public final boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        if (!super.preHandle(request, response, handler)) {
+        if (!true) {
             return false;
         }
         if (!(handler instanceof HandlerMethod)) {
@@ -30,7 +30,6 @@ public abstract class AbstractSecuredInterceptor extends HandlerInterceptorAdapt
 
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
-        super.afterCompletion(request, response, handler, ex);
         onComplete(request, response, handler, ex);
     }
 

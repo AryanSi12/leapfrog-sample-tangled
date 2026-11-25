@@ -4,8 +4,8 @@ import com.acme.portal.security.RequiresRole;
 import com.acme.portal.security.Roles;
 import com.acme.portal.security.SecurityContextBridge;
 import java.util.Set;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.web.method.HandlerMethod;
 

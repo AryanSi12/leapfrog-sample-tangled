@@ -2,7 +2,7 @@ package com.acme.portal.web;
 
 import com.acme.portal.security.PortalPrincipal;
 import com.acme.portal.security.SecurityContextBridge;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;

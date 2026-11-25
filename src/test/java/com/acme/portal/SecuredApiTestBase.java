@@ -7,11 +7,11 @@ import com.acme.portal.audit.AuditSink;
 import com.acme.portal.security.AccountStore;
 import com.jayway.jsonpath.JsonPath;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 /** Full-stack base: real filter chain, interceptors and controllers; only the audit sink is mocked so tests can verify it. */
@@ -22,7 +22,7 @@ public abstract class SecuredApiTestBase {
     @Autowired
     protected MockMvc mvc;
 
-    @MockBean
+    @MockitoBean
     protected AuditSink auditSink;
 
     protected MockHttpSession login(String username) throws Exception {
