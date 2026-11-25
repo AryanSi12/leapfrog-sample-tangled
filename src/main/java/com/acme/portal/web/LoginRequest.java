@@ -1,6 +1,6 @@
 package com.acme.portal.web;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 
 public class LoginRequest {
 

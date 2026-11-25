@@ -1,15 +1,15 @@
 package com.acme.portal.security;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.config.http.SessionCreationPolicy;
 
 /**
@@ -18,8 +18,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
  */
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
-public class LegacySecurityConfigurer extends WebSecurityConfigurerAdapter {
+@EnableMethodSecurity(securedEnabled = true)
+public class LegacySecurityConfigurer {
 
     private final PortalAuthenticationProvider provider;
     private final RestAuthenticationEntryPoint entryPoint;
@@ -33,33 +33,27 @@ public class LegacySecurityConfigurer extends WebSecurityConfigurerAdapter {
         this.bridge = bridge;
     }
 
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) {
-        auth.authenticationProvider(provider);
-    }
-
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable()
-            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-            .and()
-            .exceptionHandling().authenticationEntryPoint(entryPoint).accessDeniedHandler(deniedHandler)
-            .and()
-            .logout().logoutUrl("/api/logout")
-            .addLogoutHandler((request, response, authentication) -> bridge.clear(request))
-            .logoutSuccessHandler((request, response, authentication) -> response.setStatus(HttpServletResponse.SC_NO_CONTENT))
-            .and()
-            .authorizeRequests()
-            .antMatchers("/api/health", "/api/logout").permitAll()
-            .antMatchers(HttpMethod.POST, "/api/session").permitAll()
-            .antMatchers("/api/admin/**").hasRole(Roles.ADMIN)
-            .antMatchers("/api/**").authenticated()
-            .anyRequest().permitAll();
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http.csrf(csrf -> csrf.disable())
+            .securityContext(securityContext -> securityContext.requireExplicitSave(false))
+            .sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+            .exceptionHandling(handling -> handling.authenticationEntryPoint(entryPoint).accessDeniedHandler(deniedHandler))
+            .logout(logout -> logout.logoutUrl("/api/logout")
+                .addLogoutHandler((request, response, authentication) -> bridge.clear(request))
+                .logoutSuccessHandler((request, response, authentication) -> response.setStatus(HttpServletResponse.SC_NO_CONTENT)))
+            .authorizeHttpRequests(requests -> requests
+                .requestMatchers("/api/health", "/api/logout").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/session").permitAll()
+                .requestMatchers("/api/admin/**").hasRole(Roles.ADMIN)
+                .requestMatchers("/api/**").authenticated()
+                .anyRequest().permitAll())
+            .authenticationProvider(provider);
+        return http.build();
     }
 
     @Bean
-    @Override
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
+    public AuthenticationManager authenticationManager() {
+        return new ProviderManager(provider);
     }
 }

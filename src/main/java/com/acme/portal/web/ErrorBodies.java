@@ -3,7 +3,7 @@ package com.acme.portal.web;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 /** The one JSON error shape of the portal, used by the security entry points, the interceptors and the advice. */
 public final class ErrorBodies {
