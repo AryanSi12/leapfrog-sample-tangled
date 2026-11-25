@@ -36,6 +36,7 @@ public class LegacySecurityConfigurer {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
+            .securityContext(securityContext -> securityContext.requireExplicitSave(false))
             .sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
             .exceptionHandling(handling -> handling.authenticationEntryPoint(entryPoint).accessDeniedHandler(deniedHandler))
             .logout(logout -> logout.logoutUrl("/api/logout")
